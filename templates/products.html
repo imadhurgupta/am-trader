@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Our Products – Premium Tea & Spices | AM Trader{% endblock %}
+{% block meta_desc %}Browse AM Trader's full range of premium teas and spices. Filter by category and enquire for bulk pricing.{% endblock %}
+
+{% block content %}
+
+  <!-- ── Page Hero ─────────────────────────────────────── -->
+  <section class="page-hero" aria-label="Products Page Hero">
+    <div class="container">
+      <div class="section-tag">Our Catalogue</div>
+      <h1>Premium Tea & Spices</h1>
+      <p>Sourced from the finest farms across India. Pure, natural, authentic.</p>
+    </div>
+  </section>
+
+  <!-- ── Filter Bar ────────────────────────────────────── -->
+  <div class="filter-bar" role="navigation" aria-label="Product Filters">
+    <div class="container">
+      <div class="filter-tabs">
+        <a href="{{ url_for('products') }}"
+           class="filter-tab {% if active_filter == 'all' %}active{% endif %}"
+           data-filter="all"
+           id="filter-all">
+          🌟 All Products
+        </a>
+        <a href="{{ url_for('products', category='tea') }}"
+           class="filter-tab {% if active_filter == 'tea' %}active{% endif %}"
+           data-filter="tea"
+           id="filter-tea">
+          🍵 Tea
+        </a>
+        <a href="{{ url_for('products', category='spice') }}"
+           class="filter-tab {% if active_filter == 'spice' %}active{% endif %}"
+           data-filter="spice"
+           id="filter-spice">
+          🌶️ Spices
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Products Grid ─────────────────────────────────── -->
+  <section class="products-section" aria-label="Product Listing">
+    <div class="container">
+      <p class="products-count">
+        Showing <strong>{{ products|length }}</strong>
+        {% if active_filter == 'tea' %}tea{% elif active_filter == 'spice' %}spice{% else %}{% endif %}
+        product{{ 's' if products|length != 1 else '' }}
+      </p>
+
+      {% if products %}
+      <div class="products-grid">
+        {% for product in products %}
+        <article class="product-card reveal stagger-{{ (loop.index0 % 3) + 1 }}">
+          <div class="product-img-wrap">
+            <img
+              src="{{ url_for('static', filename='images/' + product.image_filename) }}"
+              alt="{{ product.name }}"
+              loading="lazy"
+            />
+            <span class="product-badge {{ 'spice' if product.category == 'Spice' else '' }}">
+              {{ product.category }}
+            </span>
+            {% if product.is_bestseller %}
+            <span class="bestseller-tag">⭐ Best Seller</span>
+            {% endif %}
+          </div>
+          <div class="product-body">
+            <h2 class="product-name" style="font-size:1.1rem;">{{ product.name }}</h2>
+            <p class="product-desc">{{ product.description }}</p>
+
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div style="text-align:center; padding:80px 0; color:var(--text-muted);">
+        <div style="font-size:3rem; margin-bottom:16px;">🔍</div>
+        <h3 style="color:var(--green-dark); margin-bottom:8px;">No products found</h3>
+        <p>Try a different filter or <a href="{{ url_for('products') }}" style="color:var(--green-primary);">view all products</a>.</p>
+      </div>
+      {% endif %}
+
+      <!-- Bulk CTA -->
+      <div class="reveal bulk-cta-inner" style="margin-top:70px; background:linear-gradient(135deg,var(--green-dark),var(--green-primary)); border-radius:var(--radius-lg); padding:48px 40px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;">
+        <div>
+          <h3 style="font-family:'Playfair Display',serif; color:var(--white); margin-bottom:8px;">Need a Bulk Order?</h3>
+          <p style="color:rgba(255,255,255,0.75); font-size:0.95rem; max-width:520px;">
+            We supply to retailers, restaurants, and wholesalers across India. Get custom pricing for large quantities.
+          </p>
+        </div>
+        <a href="{{ url_for('contact') }}" class="btn btn-primary" id="bulk-cta-btn" style="flex-shrink:0;">
+          📞 Get a Quote
+        </a>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}
