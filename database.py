@@ -54,7 +54,7 @@ def init_db():
                 'Green Tea',
                 'Tea',
                 'Hand-picked premium green tea leaves with a delicate, grassy aroma and antioxidant-rich benefits.',
-                'Green Tea.jpg',
+                'Green-Tea.jpg',
                 1,
                 '100g'
             ),
@@ -62,7 +62,7 @@ def init_db():
                 'Black Pepper',
                 'Spice',
                 'Whole black peppercorns with a sharp, pungent aroma. Freshly ground to elevate every dish.',
-                'Black Papper.jpg',
+                'Black-Papper.jpg',
                 1,
                 '200g'
             ),
@@ -70,7 +70,7 @@ def init_db():
                 'Black Salt (Kala Namak)',
                 'Spice',
                 'Natural volcanic black salt with a distinctive sulphurous aroma, used in chutneys, chaats, and ayurvedic recipes.',
-                'Black Salt.jpg',
+                'Black-Salt.jpg',
                 0,
                 '250g'
             ),
@@ -78,7 +78,7 @@ def init_db():
                 'Aamchur Powder',
                 'Spice',
                 'Sun-dried raw mango powder with a tangy, fruity sourness – the secret ingredient for authentic Indian street food.',
-                'Aamchur Powder.jpg',
+                'Aamchur-Powder.jpg',
                 0,
                 '100g'
             ),
@@ -86,7 +86,7 @@ def init_db():
                 'Coriander Powder',
                 'Spice',
                 'Freshly ground coriander seeds with a warm, citrusy flavour. A staple spice in Indian, Middle Eastern, and Mexican cuisine.',
-                'Coriandar Powder.jpg',
+                'Coriandar-Powder.jpg',
                 0,
                 '200g'
             ),
@@ -94,7 +94,7 @@ def init_db():
                 'Cumin Powder',
                 'Spice',
                 'Stone-ground cumin with an earthy, nutty aroma that forms the backbone of countless spice blends and curries.',
-                'Cumin Powder.jpg',
+                'Cumin-Powder.jpg',
                 1,
                 '100g'
             ),
@@ -102,7 +102,7 @@ def init_db():
                 'Garam Masala',
                 'Spice',
                 'A warm, aromatic blend of whole spices – cinnamon, cardamom, cloves, and more – slow-roasted and ground in-house.',
-                'Garam Masala.jpg',
+                'Garam-Masala.jpg',
                 1,
                 '100g'
             ),
@@ -110,7 +110,7 @@ def init_db():
                 'Red Chilli Powder',
                 'Spice',
                 'Vibrant, fiery red chilli powder made from sun-dried Kashmiri and Byadgi chillies. Adds colour and heat.',
-                'Red Chilli Powder.jpg',
+                'Red-Chilli-Powder.jpg',
                 0,
                 '200g'
             ),
@@ -118,7 +118,7 @@ def init_db():
                 'Turmeric Powder',
                 'Spice',
                 'Pure, high-curcumin turmeric root powder with an intense golden colour and earthy, slightly bitter taste.',
-                'Turmeric Powder.jpg',
+                'Turmeric-Powder.jpg',
                 1,
                 '200g'
             ),
