@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}AM Trader – Premium Tea & Spices from India{% endblock %}
-{% block meta_desc %}AM Trader brings you the finest quality tea and spices sourced directly from India's best gardens and farms. Bulk orders, pan-India shipping.{% endblock %}
+{% block title %}The Saveur – Premium Tea & Spices from India{% endblock %}
+{% block meta_desc %}The Saveur brings you the finest quality tea and spices sourced directly from India's best gardens and farms. Bulk orders, pan-India shipping.{% endblock %}
 
 {% block content %}
 
@@ -9,33 +9,56 @@
        HERO SECTION
   ══════════════════════════════════════════════════════ -->
   <section class="hero" id="hero" aria-label="Hero Section">
-    <div class="hero-bg" role="img" aria-label="Lush tea garden plantation"></div>
-    <div class="hero-overlay"></div>
-
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-badge">
-          🍃 Direct from the Source
-        </div>
-        <h1>
-          Nature's Finest<br/>
-          <em>Tea & Spices</em><br/>
-          for Every Kitchen
-        </h1>
-        <p>
-          Premium quality, authentically sourced teas and spices, delivered across India.
-          From Assam's tea gardens to Kerala's spice farms — pure, natural, trusted.
-        </p>
-        <div class="hero-actions">
-          <a href="{{ url_for('products') }}" class="btn btn-primary" id="hero-explore-btn">
-            🛒 Explore Products
-          </a>
-          <a href="{{ url_for('contact') }}" class="btn btn-white" id="hero-enquire-btn">
-            📞 Get Bulk Quote
-          </a>
+    <!-- Carousel Slides -->
+    <div class="hero-carousel">
+      {% for slide in carousel_slides %}
+      <div class="hero-slide {% if loop.first %}active{% endif %}">
+        <div class="hero-bg" style="background-image: url('{% if '://' in slide.image_filename %}{{ slide.image_filename }}{% else %}{{ url_for('static', filename='images/' + slide.image_filename) }}{% endif %}');" role="img" aria-label="{{ slide.title }}"></div>
+        <div class="hero-overlay"></div>
+        <div class="container">
+          <div class="hero-content">
+            {% if slide.badge_text %}
+            <div class="hero-badge">
+              {% if slide.badge_icon %}
+                <i data-lucide="{{ slide.badge_icon }}"></i>
+              {% endif %}
+              {{ slide.badge_text }}
+            </div>
+            {% endif %}
+            <h1>
+              {{ slide.title | replace('\n', '<br/>') | safe }}
+            </h1>
+            {% if slide.description %}
+            <p>{{ slide.description }}</p>
+            {% endif %}
+            <div class="hero-actions">
+              <a href="{{ slide.button_link }}" class="btn btn-primary">
+                <i data-lucide="shopping-cart"></i> {{ slide.button_text }}
+              </a>
+              <a href="{{ url_for('contact') }}" class="btn btn-white">
+                <i data-lucide="phone"></i> Get Bulk Quote
+              </a>
+            </div>
+          </div>
         </div>
       </div>
+      {% endfor %}
     </div>
+
+    <!-- Carousel Controls -->
+    {% if carousel_slides|length > 1 %}
+    <button class="carousel-control prev" aria-label="Previous Slide"><i data-lucide="chevron-left"></i></button>
+    <button class="carousel-control next" aria-label="Next Slide"><i data-lucide="chevron-right"></i></button>
+    {% endif %}
+
+    <!-- Carousel Indicators -->
+    {% if carousel_slides|length > 1 %}
+    <div class="carousel-indicators">
+      {% for slide in carousel_slides %}
+      <span class="indicator {% if loop.first %}active{% endif %}" data-slide="{{ loop.index0 }}"></span>
+      {% endfor %}
+    </div>
+    {% endif %}
 
     <div class="hero-scroll" aria-hidden="true">
       <span>SCROLL</span>
@@ -51,18 +74,18 @@
     <div class="container">
       <div class="trust-bar-grid">
         <div class="trust-item">
-          <span class="trust-icon">📦</span>
+          <span class="trust-icon"><i data-lucide="package"></i></span>
           <span class="trust-number" data-target="1200" data-suffix="+">1200+</span>
           <span class="trust-label">Orders Delivered</span>
         </div>
         <div class="trust-item">
-          <span class="trust-icon">🌿</span>
+          <span class="trust-icon"><i data-lucide="leaf"></i></span>
           <span class="trust-number" data-target="100" data-suffix="%">100%</span>
           <span class="trust-label">Natural & Pure</span>
         </div>
 
         <div class="trust-item">
-          <span class="trust-icon">🚚</span>
+          <span class="trust-icon"><i data-lucide="truck"></i></span>
           <span class="trust-number" data-target="28" data-suffix="+">28+</span>
           <span class="trust-label">States Served</span>
         </div>
@@ -70,15 +93,44 @@
     </div>
   </section>
 
+  <!-- ══════════════════════════════════════════════════════
+       SHOP BY CATEGORY
+  ══════════════════════════════════════════════════════ -->
+  <section class="category-section" id="categories" aria-label="Shop by Category">
+    <div class="container">
+      <div class="text-center section-header reveal">
+        <div class="section-tag">Our Collection</div>
+        <h2 class="section-title">Shop by Category</h2>
+        <p class="section-subtitle" style="margin-top:12px;">
+          Discover our curated selection of premium organic teas and handpicked Indian spices.
+        </p>
+      </div>
+
+      <div class="category-grid">
+        {% for cat in categories %}
+        <a href="{{ url_for('products', category=cat.name|lower) }}" class="category-card reveal stagger-{{ loop.index }}">
+          <div class="category-card-bg" style="background-image: url('{% if '://' in cat.image_filename %}{{ cat.image_filename }}{% else %}{{ url_for('static', filename='images/' + cat.image_filename) }}{% endif %}');"></div>
+          <div class="category-card-overlay"></div>
+          <div class="category-card-content">
+            <h3>{{ cat.display_name }}</h3>
+            <p>{{ cat.description }}</p>
+            <span class="btn-link">Explore {{ cat.display_name }} <i data-lucide="arrow-right"></i></span>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
 
   <!-- ══════════════════════════════════════════════════════
-       WHY AM TRADER
+       WHY THE SAVEUR
   ══════════════════════════════════════════════════════ -->
-  <section class="why-section" id="why" aria-label="Why Choose AM Trader">
+  <section class="why-section" id="why" aria-label="Why Choose The Saveur">
     <div class="container">
       <div class="text-center section-header reveal">
         <div class="section-tag">Our Promise</div>
-        <h2 class="section-title">Why Choose AM Trader?</h2>
+        <h2 class="section-title">Why Choose The Saveur?</h2>
         <p class="section-subtitle" style="margin-top:12px;">
           We don't just sell spices — we deliver an experience rooted in quality, trust, and tradition.
         </p>
@@ -86,22 +138,22 @@
 
       <div class="why-grid">
         <div class="why-card reveal stagger-1">
-          <div class="why-icon">🌿</div>
+          <div class="why-icon"><i data-lucide="leaf"></i></div>
           <h3>Purity Guaranteed</h3>
           <p>Every product undergoes rigorous quality checks. No additives, no artificial colours — just nature's best.</p>
         </div>
         <div class="why-card reveal stagger-2">
-          <div class="why-icon">🤝</div>
+          <div class="why-icon"><i data-lucide="handshake"></i></div>
           <h3>Direct Sourcing</h3>
           <p>We source directly from verified farmers and tea estates, cutting out middlemen and ensuring freshness.</p>
         </div>
         <div class="why-card reveal stagger-3">
-          <div class="why-icon">📦</div>
+          <div class="why-icon"><i data-lucide="package"></i></div>
           <h3>Bulk Orders Welcome</h3>
           <p>Whether you're a retailer, restaurant, or household — we cater to all volumes with competitive pricing.</p>
         </div>
         <div class="why-card reveal stagger-4">
-          <div class="why-icon">🚀</div>
+          <div class="why-icon"><i data-lucide="globe"></i></div>
           <h3>Pan-India Delivery</h3>
           <p>Fast, reliable shipping to all 28+ states. Secure packaging that preserves freshness and aroma.</p>
         </div>
@@ -126,23 +178,41 @@
       <div class="products-grid">
         {% for product in bestsellers %}
         <article class="product-card reveal stagger-{{ loop.index }}">
-          <div class="product-img-wrap">
-            <img
-              src="{{ url_for('static', filename='images/' + product.image_filename) }}"
-              alt="{{ product.name }}"
-              loading="lazy"
-            />
-            <span class="product-badge {{ 'spice' if product.category == 'Spice' else '' }}">
-              {{ product.category }}
-            </span>
-            {% if product.is_bestseller %}
-            <span class="bestseller-tag">⭐ Best Seller</span>
-            {% endif %}
-          </div>
+          <a href="{{ url_for('product_detail', id=product.id) }}" style="display:block; text-decoration:none; color:inherit;">
+            <div class="product-img-wrap">
+              <img
+                src="{% if '://' in product.image_filename %}{{ product.image_filename }}{% else %}{{ url_for('static', filename='images/' + product.image_filename) }}{% endif %}"
+                alt="{{ product.name }}"
+                loading="lazy"
+              />
+              <span class="product-badge {{ 'spice' if product.category == 'Spice' else '' }}">
+                {{ product.category }}
+              </span>
+              {% if product.is_bestseller %}
+              <span class="bestseller-tag">⭐ Best Seller</span>
+              {% endif %}
+            </div>
+          </a>
           <div class="product-body">
-            <h3 class="product-name">{{ product.name }}</h3>
+            <h3 class="product-name" style="margin-bottom:8px;">
+              <a href="{{ url_for('product_detail', id=product.id) }}" style="color:inherit; text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--green-primary)'" onmouseout="this.style.color='inherit'">{{ product.name }}</a>
+            </h3>
             <p class="product-desc">{{ product.description }}</p>
-
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid rgba(0,0,0,0.06); padding-top:12px;">
+              <div>
+                <span style="font-size:1.25rem; font-weight:700; color:var(--green-dark);">₹{{ product.price }}</span>
+                <span style="font-size:0.8rem; color:var(--text-muted);">/ {{ product.unit }}</span>
+              </div>
+              <div>
+                {% if product.stocks > 10 %}
+                  <span style="font-size:0.8rem; color:#2ecc71; font-weight:600;">In Stock</span>
+                {% elif product.stocks > 0 %}
+                  <span style="font-size:0.8rem; color:#e67e22; font-weight:600;">Low Stock</span>
+                {% else %}
+                  <span style="font-size:0.8rem; color:#e74c3c; font-weight:600; text-transform:uppercase;">Out of Stock</span>
+                {% endif %}
+              </div>
+            </div>
           </div>
         </article>
         {% endfor %}
@@ -233,7 +303,7 @@
               <textarea id="home-message" name="message" placeholder="Tell us about your requirements, quantity needed, etc."></textarea>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;" id="home-submit-btn">
-              📩 Send Enquiry
+              <i data-lucide="send" style="margin-right:8px;"></i> Send Enquiry
             </button>
           </form>
         </div>
@@ -332,4 +402,71 @@
     </div>
   </section>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const slides = document.querySelectorAll('.hero-slide');
+    const indicators = document.querySelectorAll('.indicator');
+    const prevBtn = document.querySelector('.carousel-control.prev');
+    const nextBtn = document.querySelector('.carousel-control.next');
+    let currentSlide = 0;
+    let slideInterval;
+
+    function showSlide(index) {
+      if (!slides.length) return;
+      slides.forEach(slide => slide.classList.remove('active'));
+      indicators.forEach(ind => ind.classList.remove('active'));
+      
+      currentSlide = (index + slides.length) % slides.length;
+      slides[currentSlide].classList.add('active');
+      indicators[currentSlide].classList.add('active');
+    }
+
+    function nextSlide() {
+      showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      showSlide(currentSlide - 1);
+    }
+
+    function startAutoplay() {
+      slideInterval = setInterval(nextSlide, 6000);
+    }
+
+    function stopAutoplay() {
+      clearInterval(slideInterval);
+    }
+
+    if (slides.length > 0) {
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          prevSlide();
+          stopAutoplay();
+          startAutoplay();
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          nextSlide();
+          stopAutoplay();
+          startAutoplay();
+        });
+      }
+
+      indicators.forEach(indicator => {
+        indicator.addEventListener('click', () => {
+          showSlide(parseInt(indicator.getAttribute('data-slide')));
+          stopAutoplay();
+          startAutoplay();
+        });
+      });
+
+      startAutoplay();
+    }
+  });
+</script>
 {% endblock %}

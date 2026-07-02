@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+
+{% block title %}Become a Delivery Partner – The Saveur{% endblock %}
+{% block meta_desc %}Join The Saveur delivery network. Apply to become a delivery partner and earn with flexible hours delivering premium teas and spices.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .dp-hero {
+    background: linear-gradient(135deg, var(--green-dark) 0%, #3d6b1a 60%, #5a9e35 100%);
+    padding: 120px 24px 80px;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .dp-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .dp-hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    border-radius: 99px;
+    padding: 6px 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .dp-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  .dp-hero p {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.85);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Benefits */
+  .dp-benefits {
+    padding: 80px 24px;
+    background: var(--cream);
+  }
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 28px;
+    max-width: 1100px;
+    margin: 48px auto 0;
+  }
+  .benefit-card {
+    background: #fff;
+    border-radius: var(--radius-md);
+    padding: 32px 28px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .benefit-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 28px rgba(45,80,22,0.12);
+  }
+  .benefit-icon {
+    font-size: 2.5rem;
+    margin-bottom: 18px;
+  }
+  .benefit-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    margin-bottom: 8px;
+  }
+  .benefit-card p {
+    font-size: 0.9rem;
+    color: var(--text-mid);
+    line-height: 1.5;
+  }
+
+  /* How it works */
+  .dp-how {
+    padding: 80px 24px;
+    background: var(--cream-dark, #f5f2ec);
+  }
+  .how-steps {
+    display: flex;
+    gap: 0;
+    max-width: 900px;
+    margin: 48px auto 0;
+    position: relative;
+  }
+  .how-steps::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    left: 72px;
+    right: 72px;
+    height: 2px;
+    background: linear-gradient(to right, var(--green-primary), var(--amber));
+    z-index: 0;
+  }
+  .how-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    padding: 0 12px;
+  }
+  .step-num {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--green-primary), var(--green-light));
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 16px rgba(45,80,22,0.3);
+    border: 3px solid #fff;
+  }
+  .how-step h4 { font-weight: 700; font-size: 0.9rem; color: var(--green-dark); margin-bottom: 6px; }
+  .how-step p  { font-size: 0.8rem; color: var(--text-mid); line-height: 1.4; }
+
+  /* Application Form */
+  .dp-form-section {
+    padding: 80px 24px;
+    background: #fff;
+  }
+  .dp-form-card {
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--cream);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    padding: 52px 48px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+  }
+  .dp-form-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    color: var(--green-dark);
+    margin-bottom: 8px;
+  }
+  .dp-form-card .form-subtitle {
+    color: var(--text-mid);
+    margin-bottom: 36px;
+    font-size: 0.95rem;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .dp-form-card { padding: 32px 20px; }
+    .how-steps { flex-direction: column; gap: 24px; }
+    .how-steps::before { display: none; }
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--green-light);
+    box-shadow: 0 0 0 3px rgba(90,158,53,0.12);
+  }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+  .dp-submit {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--green-primary) 0%, var(--green-light) 100%);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 20px rgba(45,80,22,0.3);
+    margin-top: 8px;
+  }
+  .dp-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(45,80,22,0.4);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="dp-hero" aria-label="Delivery Partner Hero">
+  <div class="dp-hero-tag">🚚 Join Our Network</div>
+  <h1>Deliver with The Saveur</h1>
+  <p>Join our growing fleet of trusted delivery partners and earn while delivering premium teas and spices across India. Flexible hours, quick payouts.</p>
+</section>
+
+<!-- Benefits -->
+<section class="dp-benefits" aria-label="Partner Benefits">
+  <div class="container">
+    <div class="section-tag" style="text-align:center; display:block;">Why Deliver With Us?</div>
+    <h2 class="section-title" style="text-align:center;">Perks of Being a Partner</h2>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">💰</div>
+        <h3>Competitive Earnings</h3>
+        <p>Earn per delivery with attractive rates and weekly payouts directly to your bank account.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">⏰</div>
+        <h3>Flexible Timings</h3>
+        <p>Work at your own pace. Choose your hours and delivery slots that fit your schedule.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">📱</div>
+        <h3>Easy Digital Portal</h3>
+        <p>Manage all your deliveries from a single, beautiful dashboard with real-time updates.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🛡️</div>
+        <h3>Safe & Lightweight</h3>
+        <p>Delivering tea and spices is easy – no heavy lifting, no fragile electronics.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="dp-how" aria-label="How Delivery Partner Process Works">
+  <div class="container">
+    <div class="section-tag" style="text-align:center; display:block;">Simple Process</div>
+    <h2 class="section-title" style="text-align:center;">How It Works</h2>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <h4>Apply Below</h4>
+        <p>Fill out your details and submit the application form.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <h4>Get Approved</h4>
+        <p>Our admin team reviews your application and activates your account.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <h4>Get Orders Assigned</h4>
+        <p>Admin assigns orders to you based on your city and availability.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <h4>Deliver & Earn</h4>
+        <p>Use your delivery portal to pick up, scan and mark deliveries done.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Application Form -->
+<section class="dp-form-section" aria-label="Delivery Partner Application Form">
+  <div class="dp-form-card">
+    <h2>Partner Application</h2>
+    <p class="form-subtitle">Fill in your details and we'll get back to you shortly.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div style="padding:14px 18px; border-radius:8px; margin-bottom:20px; font-size:0.9rem; font-weight:500;
+          background:{% if category=='success' %}rgba(46,204,113,0.1); border:1px solid #2ecc71; color:#1a7a44;{% else %}rgba(231,76,60,0.1); border:1px solid #e74c3c; color:#c0392b;{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('delivery_partner') }}" id="dp-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dp-name">Full Name *</label>
+          <input type="text" id="dp-name" name="full_name" placeholder="Your full name" required>
+        </div>
+        <div class="form-group">
+          <label for="dp-email">Email Address *</label>
+          <input type="email" id="dp-email" name="email" placeholder="you@example.com" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dp-phone">Phone Number *</label>
+          <input type="tel" id="dp-phone" name="phone" placeholder="+91 98765 43210" required>
+        </div>
+        <div class="form-group">
+          <label for="dp-city">City *</label>
+          <input type="text" id="dp-city" name="city" placeholder="e.g. Bengaluru" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dp-vehicle">Vehicle Type *</label>
+          <select id="dp-vehicle" name="vehicle_type" required>
+            <option value="" disabled selected>Select your vehicle</option>
+            <option value="Bicycle">Bicycle</option>
+            <option value="Motorbike">Motorbike</option>
+            <option value="Scooter">Scooter</option>
+            <option value="Car">Car</option>
+            <option value="Auto Rickshaw">Auto Rickshaw</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="dp-exp">Years of Delivery Experience</label>
+          <input type="number" id="dp-exp" name="experience_years" min="0" max="30" placeholder="0" value="0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="dp-message">Tell us more about yourself (Optional)</label>
+        <textarea id="dp-message" name="message" placeholder="Any additional information..."></textarea>
+      </div>
+
+      <button type="submit" class="dp-submit">🚀 Submit Application</button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,525 @@
+{% extends "base.html" %}
+
+{% block title %}Delivery Dashboard – The Saveur{% endblock %}
+{% block meta_desc %}Delivery partner portal for The Saveur. View assigned orders, update delivery status, and scan QR codes.{% endblock %}
+
+{% block extra_head %}
+<style>
+  :root {
+    --dp-green: #2D5016;
+    --dp-light: #5a9e35;
+    --dp-amber: #C8860A;
+    --dp-cream: #fcfbf9;
+    --dp-card: #fff;
+    --dp-border: rgba(0,0,0,0.08);
+  }
+
+  body { background: var(--dp-cream); }
+
+  .dp-portal {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 110px 24px 80px;
+  }
+
+  /* Header */
+  .dp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .dp-header-left h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    color: var(--dp-green);
+    margin-bottom: 4px;
+  }
+  .dp-header-left p { color: #6b7280; font-size: 0.9rem; }
+  .dp-partner-badge {
+    background: linear-gradient(135deg, var(--dp-green), var(--dp-light));
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  /* Stats bar */
+  .dp-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .dp-stat {
+    background: var(--dp-card);
+    border: 1px solid var(--dp-border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .dp-stat-num { font-size: 2rem; font-weight: 800; color: var(--dp-green); line-height: 1; }
+  .dp-stat-label { font-size: 0.8rem; color: #9ca3af; margin-top: 4px; font-weight: 500; }
+
+  /* QR Scanner Section */
+  .qr-section {
+    background: var(--dp-card);
+    border: 1px solid var(--dp-border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .qr-section h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dp-green);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .qr-section p { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
+  .qr-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+  .btn-scan {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--dp-green), var(--dp-light));
+    color: #fff;
+    border: none;
+    border-radius: 99px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(45,80,22,0.3);
+  }
+  .btn-scan:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(45,80,22,0.4); }
+  .btn-stop {
+    padding: 12px 24px;
+    background: rgba(231,76,60,0.1);
+    color: #c0392b;
+    border: 1px solid rgba(231,76,60,0.2);
+    border-radius: 99px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: none;
+    transition: all 0.2s ease;
+  }
+  #qr-reader { width: 100%; max-width: 420px; border-radius: 12px; overflow: hidden; }
+  #qr-result {
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-top: 16px;
+    display: none;
+  }
+  #qr-result.success { background: rgba(46,204,113,0.1); border: 1px solid #2ecc71; color: #1a7a44; }
+  #qr-result.error   { background: rgba(231,76,60,0.1);  border: 1px solid #e74c3c; color: #c0392b; }
+
+  /* Orders Table */
+  .orders-section {
+    background: var(--dp-card);
+    border: 1px solid var(--dp-border);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .orders-section h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dp-green);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .order-card {
+    border: 1px solid var(--dp-border);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+  }
+  .order-card:hover { box-shadow: 0 4px 20px rgba(45,80,22,0.1); }
+  .order-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 18px 20px;
+    background: #f9fafb;
+    border-bottom: 1px solid var(--dp-border);
+  }
+  .order-card-id {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--dp-green);
+  }
+  .order-card-date { font-size: 0.8rem; color: #9ca3af; }
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 14px;
+    border-radius: 99px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .status-badge.processing { background: rgba(52,152,219,0.12); color: #2980b9; }
+  .status-badge.shipped    { background: rgba(230,126,34,0.12);  color: #d35400; }
+  .status-badge.delivered  { background: rgba(46,204,113,0.12);  color: #1a7a44; }
+  .status-badge.cancelled  { background: rgba(231,76,60,0.12);   color: #c0392b; }
+
+  .order-card-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 600px) { .order-card-body { grid-template-columns: 1fr; } }
+
+  .order-info-group h4 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9ca3af;
+    margin-bottom: 6px;
+  }
+  .order-info-group p { font-size: 0.9rem; color: var(--text-dark, #1c1917); line-height: 1.5; }
+  .items-list { list-style: none; padding: 0; margin: 0; }
+  .items-list li { font-size: 0.85rem; color: #374151; padding: 2px 0; }
+  .items-list li::before { content: '• '; color: var(--dp-light); }
+
+  .order-card-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--dp-border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .order-card-footer label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+  }
+  .status-select {
+    padding: 8px 14px;
+    border: 1.5px solid var(--dp-border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark, #1c1917);
+    background: #fff;
+    cursor: pointer;
+  }
+  .btn-update {
+    padding: 8px 20px;
+    background: linear-gradient(135deg, var(--dp-green), var(--dp-light));
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-update:hover { opacity: 0.9; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: #9ca3af;
+  }
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 1.1rem; color: #6b7280; font-weight: 600; margin-bottom: 8px; }
+</style>
+<!-- html5-qrcode library -->
+<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="dp-portal">
+
+  <!-- Header -->
+  <div class="dp-header">
+    <div class="dp-header-left">
+      <h1>🚚 Delivery Dashboard</h1>
+      <p>Manage your assigned orders and mark deliveries complete.</p>
+    </div>
+    <div class="dp-partner-badge">
+      👤 {{ session.get('user_name', 'Partner') }}
+    </div>
+  </div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div style="padding:14px 18px; border-radius:8px; margin-bottom:20px; font-size:0.9rem; font-weight:500;
+        background:{% if category=='success' %}rgba(46,204,113,0.1); border:1px solid #2ecc71; color:#1a7a44;{% else %}rgba(231,76,60,0.1); border:1px solid #e74c3c; color:#c0392b;{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- Stats -->
+  <div class="dp-stats">
+    {% set total = orders|length %}
+    {% set delivered = orders|selectattr('status','equalto','Delivered')|list|length %}
+    {% set active = orders|rejectattr('status','equalto','Delivered')|rejectattr('status','equalto','Cancelled')|list|length %}
+    <div class="dp-stat">
+      <div class="dp-stat-num">{{ total }}</div>
+      <div class="dp-stat-label">Total Assigned</div>
+    </div>
+    <div class="dp-stat">
+      <div class="dp-stat-num">{{ active }}</div>
+      <div class="dp-stat-label">Active Orders</div>
+    </div>
+    <div class="dp-stat">
+      <div class="dp-stat-num">{{ delivered }}</div>
+      <div class="dp-stat-label">Delivered</div>
+    </div>
+    <div class="dp-stat">
+      <div class="dp-stat-num">{{ orders|selectattr('status','equalto','Cancelled')|list|length }}</div>
+      <div class="dp-stat-label">Cancelled</div>
+    </div>
+  </div>
+
+  <!-- QR Scanner -->
+  <div class="qr-section">
+    <h2>📷 QR Code Scanner</h2>
+    <p>Scan the QR code on a customer's order to instantly mark it as <strong>Delivered</strong>.</p>
+    <div class="qr-controls">
+      <button class="btn-scan" id="btn-start-scan">📷 Start Scanner</button>
+      <button class="btn-stop" id="btn-stop-scan">✕ Stop Scanner</button>
+    </div>
+    <div id="qr-reader"></div>
+    <div id="qr-result"></div>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-section">
+    <h2>📦 My Assigned Orders</h2>
+
+    {% if orders %}
+      {% for ord in orders %}
+      <div class="order-card" id="order-card-{{ ord.id }}">
+        <div class="order-card-header">
+          <div>
+            <div class="order-card-id">Order #{{ ord.order_number if ord.order_number else ord.id }}</div>
+            <div class="order-card-date">{{ ord.created_at.split()[0] if ord.created_at else '' }}</div>
+          </div>
+          <span class="status-badge {{ ord.status.lower() }}" id="status-badge-{{ ord.id }}">
+            {% if ord.status == 'Processing' %}🔵 Processing
+            {% elif ord.status == 'Shipped' %}🟠 Shipped / In Transit
+            {% elif ord.status == 'Delivered' %}✅ Delivered
+            {% else %}❌ Cancelled{% endif %}
+          </span>
+        </div>
+
+        <div class="order-card-body">
+          <div class="order-info-group">
+            <h4>Customer Details</h4>
+            <p>
+              <strong>{{ ord.customer_name }}</strong><br>
+              {{ ord.customer_email }}<br>
+            </p>
+          </div>
+          <div class="order-info-group">
+            <h4>Delivery Address</h4>
+            <p>
+              {{ ord.shipping_address }},<br>
+              {{ ord.city }}, {{ ord.state }} – {{ ord.zip_code }}
+            </p>
+          </div>
+          <div class="order-info-group">
+            <h4>Items</h4>
+            <ul class="items-list">
+              {% for item in ord.items %}
+              <li>{{ item.product_name }} × {{ item.quantity }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="order-info-group">
+            <h4>Order Amount</h4>
+            <p><strong style="font-size:1.2rem; color:var(--dp-green);">₹{{ ord.total_amount }}</strong></p>
+            <p style="margin-top:8px;">
+              <!-- QR code for this order (customer/driver reference) -->
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ ord.id }}&color=2D5016&bgcolor=fcfbf9"
+                   alt="QR Code for Order {{ ord.id }}"
+                   style="border-radius:8px; border:1px solid var(--dp-border);" />
+            </p>
+          </div>
+        </div>
+
+        {% if ord.status not in ['Delivered','Cancelled'] %}
+        <div class="order-card-footer">
+          <label for="status-select-{{ ord.id }}">Update Status:</label>
+          <select class="status-select" id="status-select-{{ ord.id }}">
+            <option value="Picked Up" {% if ord.status=='Shipped' %}selected{% endif %}>Picked Up</option>
+            <option value="In Transit">In Transit</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <button class="btn-update" onclick="updateOrderStatus({{ ord.id }})">Update</button>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No orders assigned yet</h3>
+        <p>The admin will assign orders to you soon. Check back shortly!</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  let html5QrCode = null;
+
+  document.getElementById('btn-start-scan').addEventListener('click', () => {
+    document.getElementById('btn-start-scan').style.display = 'none';
+    document.getElementById('btn-stop-scan').style.display = 'inline-flex';
+    const resultEl = document.getElementById('qr-result');
+    resultEl.style.display = 'none';
+
+    html5QrCode = new Html5Qrcode("qr-reader");
+    html5QrCode.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      async (decodedText) => {
+        // Stop scanner
+        await html5QrCode.stop();
+        html5QrCode = null;
+        document.getElementById('btn-start-scan').style.display = 'inline-flex';
+        document.getElementById('btn-stop-scan').style.display = 'none';
+
+        // Parse order id from scanned text
+        const orderId = parseInt(decodedText.trim());
+        if (isNaN(orderId)) {
+          showQrResult('error', '❌ Invalid QR code. Could not read order ID.');
+          return;
+        }
+
+        showQrResult('success', `⏳ Processing Order #${orderId}...`);
+
+        try {
+          const res = await fetch('/api/delivery/scan-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_id: orderId })
+          });
+          const data = await res.json();
+          if (data.success) {
+            showQrResult('success', `✅ ${data.message}`);
+            // Update the status badge on the page if visible
+            const badge = document.getElementById(`status-badge-${orderId}`);
+            if (badge) {
+              badge.className = 'status-badge delivered';
+              badge.textContent = '✅ Delivered';
+            }
+            const footer = document.querySelector(`#order-card-${orderId} .order-card-footer`);
+            if (footer) footer.remove();
+          } else {
+            showQrResult('error', `❌ ${data.error}`);
+          }
+        } catch (err) {
+          showQrResult('error', `❌ Network error: ${err.message}`);
+        }
+      },
+      (errorMsg) => { /* ignore scan misses */ }
+    ).catch(err => {
+      showQrResult('error', `❌ Camera error: ${err}`);
+      document.getElementById('btn-start-scan').style.display = 'inline-flex';
+      document.getElementById('btn-stop-scan').style.display = 'none';
+    });
+  });
+
+  document.getElementById('btn-stop-scan').addEventListener('click', async () => {
+    if (html5QrCode) {
+      await html5QrCode.stop();
+      html5QrCode = null;
+    }
+    document.getElementById('qr-reader').innerHTML = '';
+    document.getElementById('btn-start-scan').style.display = 'inline-flex';
+    document.getElementById('btn-stop-scan').style.display = 'none';
+  });
+
+  function showQrResult(type, msg) {
+    const el = document.getElementById('qr-result');
+    el.className = `qr-result ${type}`;
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  async function updateOrderStatus(orderId) {
+    const statusEl = document.getElementById(`status-select-${orderId}`);
+    const status = statusEl.value;
+
+    try {
+      const res = await fetch(`/api/delivery/update-status/${orderId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const badge = document.getElementById(`status-badge-${orderId}`);
+        if (badge) {
+          const classMap = { 'Picked Up': 'shipped', 'In Transit': 'shipped', 'Delivered': 'delivered', 'Cancelled': 'cancelled' };
+          const labelMap = { 'Picked Up': '🟠 Shipped / In Transit', 'In Transit': '🟠 Shipped / In Transit', 'Delivered': '✅ Delivered', 'Cancelled': '❌ Cancelled' };
+          badge.className = `status-badge ${classMap[status] || 'processing'}`;
+          badge.textContent = labelMap[status] || status;
+        }
+        if (status === 'Delivered' || status === 'Cancelled') {
+          const footer = document.querySelector(`#order-card-${orderId} .order-card-footer`);
+          if (footer) footer.style.display = 'none';
+        }
+        // Show small notification
+        showNotification(`✅ Order #${orderId} updated to "${status}"`, 'success');
+      } else {
+        showNotification(`❌ ${data.error}`, 'error');
+      }
+    } catch (err) {
+      showNotification(`❌ Network error: ${err.message}`, 'error');
+    }
+  }
+
+  function showNotification(msg, type) {
+    const el = document.createElement('div');
+    el.textContent = msg;
+    el.style.cssText = `
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      padding: 14px 22px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      background: ${type === 'success' ? 'rgba(46,204,113,0.95)' : 'rgba(231,76,60,0.95)'};
+      color: #fff; animation: slideUp 0.3s ease;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+</script>
+<style>
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);   opacity: 1; }
+  }
+</style>
+{% endblock %}
