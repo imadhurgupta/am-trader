@@ -142,3 +142,31 @@ if ('ontouchstart' in window) {
     card.style.transition = 'box-shadow 0.3s ease';
   });
 }
+
+
+/* ─── Profile Dropdown Toggle ────────────────────────────── */
+const profileToggle = document.getElementById('profile-toggle');
+const profileDropdown = document.getElementById('profile-dropdown');
+if (profileToggle && profileDropdown) {
+  profileToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isExpanded = profileToggle.getAttribute('aria-expanded') === 'true';
+    profileToggle.setAttribute('aria-expanded', !isExpanded);
+    profileDropdown.style.display = isExpanded ? 'none' : 'flex';
+    const arrowIcon = profileToggle.querySelector('.arrow-icon');
+    if (arrowIcon) {
+      arrowIcon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
+      profileToggle.setAttribute('aria-expanded', 'false');
+      profileDropdown.style.display = 'none';
+      const arrowIcon = profileToggle.querySelector('.arrow-icon');
+      if (arrowIcon) {
+        arrowIcon.style.transform = 'rotate(0deg)';
+      }
+    }
+  });
+}
